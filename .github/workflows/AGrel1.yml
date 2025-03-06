@@ -30,6 +30,7 @@ jobs:
             echo "is_patch=true" >> $GITHUB_ENV
           else
             echo "is_patch=false" >> $GITHUB_ENV
+          fi
 
       - name: Create a release branch #(if not a patch release)
         if: env.is_patch == 'false'
