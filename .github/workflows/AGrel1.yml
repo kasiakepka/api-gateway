@@ -21,7 +21,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.GOAT_BOT_REPO_ACCESS }} #The auth token is persisted in the local git config. This enables your scripts to run authenticated git commands. The token is removed during post-job cleanup.
+          #token: ${{ secrets.GOAT_BOT_REPO_ACCESS }} #The auth token is persisted in the local git config. This enables your scripts to run authenticated git commands. The token is removed during post-job cleanup.
 
       - name: Determine if this is a patch release
         id: check_patch
