@@ -42,18 +42,16 @@ jobs:
             git push origin "$branch_name"
           fi
 
-      - name: Update sec-scanners-config and dependabot config image path and image tag 
+      - name: Update sec-scanners-config
         env:
           IMAGE: " - europe-docker.pkg.dev/kyma-project/prod/api-gateway/releases/api-gateway-manager"
           IMAGE_TAG: ${{ github.event.inputs.name }}
           REL_BRANCH: ${{ env.branch_name}}
         run: |
-          git config user.name "kasiakepka"
-          git config user.email "kasia.kepka23@gmail.com"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
-          git fetch origin
-          git checkout -b release/sec-scanners-config
-          git reset --hard origin/main
+          git checkout -b sec-scanners-config/$IMAGE_TAG
           sed -i "s|.*api-gateway-manager:.*|$IMAGE\:$IMAGE_TAG|g" sec-scanners-config.yaml
           git add .
           if git diff-index --quiet HEAD; then
