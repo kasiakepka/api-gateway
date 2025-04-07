@@ -44,8 +44,8 @@ jobs:
       dockerfile: Dockerfile
       context: .
       build-args: |
-        VERSION=${{ env.current_release }}
-      tags: "${{ env.current_release }}"
+        VERSION=$current_release
+      tags: "$current_release"
 
   unit-tests:
     uses: ./.github/workflows/call-unit-lint.yaml
