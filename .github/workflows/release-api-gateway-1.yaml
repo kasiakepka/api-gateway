@@ -49,7 +49,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
           git fetch origin
-          git checkout -b sec-scanners-config/$IMAGE_TAG
+          git checkout -f sec-scanners-config/$IMAGE_TAG
           git reset --hard origin/main
           sed -i "s/\(releases\|main\)\/api-gateway-manager.*/releases\/api-gateway-manager\:$IMAGE_TAG/g" sec-scanners-config.yaml
           git add .
