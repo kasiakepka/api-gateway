@@ -19,7 +19,7 @@ jobs:
       - name: Get current release from sec-scanners-config.yaml file
         shell: bash
         run: |
-            CURRENT=$(cat "${{ github.workspace }}/sec-scanners-config.yaml" | grep api-gateway-manager | cut -d ":" -f2)
+            CURRENT=$(cat ./sec-scanners-config.yaml | grep api-gateway-manager | cut -d ":" -f2)
             echo "Current release: $CURRENT"
             echo "current_release=$CURRENT" >> $GITHUB_ENV
       - name: Get latest release before releasing
