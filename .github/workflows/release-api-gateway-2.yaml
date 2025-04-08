@@ -9,9 +9,16 @@ on:
     branches:
       - 'release-**'
     paths:
-      - 'sec-scanners-config.yaml'
+      - 'sec-scanners-config.yml'
 
 jobs:
+  checkout-repository:
+    name: Checkout repository
+    uses: actions/checkout@v4
+    with:
+      fetch-depth: 0
+      token: ${{ secrets.GOAT_BOT_REPO_ACCESS }}
+    
   check-prerequisites: 
     name: check-prerequisites
     runs-on: ubuntu-latest
