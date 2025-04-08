@@ -38,6 +38,7 @@ jobs:
             echo "is_patch=true" >> $GITHUB_ENV
           else
             echo "is_patch=false" >> $GITHUB_ENV
+          fi
 
   build-image:
     uses: kyma-project/test-infra/.github/workflows/image-builder.yml@main
