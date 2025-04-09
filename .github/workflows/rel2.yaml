@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+           fetch-depth: 0
       - name: Get current release from sec-scanners-config.yaml file
         shell: bash
         run: |
@@ -39,6 +39,27 @@ jobs:
           else
             echo "is_patch=false" >> $GITHUB_ENV
           fi
+  build-image:
+    uses: kyma-project/test-infra/.github/workflows/image-builder.yml@main
+    needs: [check-prerequisites]
+    with:
+      name: api-gateway/releases/api-gateway-manager
+      dockerfile: Dockerfile
+      context: .
+      build-args: |
+        VERSION=$current_release
+      tags: "$current_release"
+
+  unit-tests:
+    uses: ./.github/workflows/call-unit-lint.yaml
+
+  integration-tests:
+    needs: build-image
+    uses: ./.github/workflows/call-integration-release.yaml
+    with:
+      image: "europe-docker.pkg.dev/kyma-project/prod/api-gateway/releases/api-gateway-manager:$current_release"
+    secrets: inherit
+ 
   create-draft:
     name: Create draft release
     runs-on: ubuntu-latest
