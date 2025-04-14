@@ -34,10 +34,8 @@ jobs:
       - name: Create a release branch
         if: env.branch_exists == 'false'
         run: |
-          if [[ "${{ env.branch_exist }}" == "false" ]]; then
             git checkout -b "$env.branch_name"
             git push origin "$env.branch_name"
-          fi
 
       - name: Update sec-scanners-config
         env:
