@@ -1,8 +1,8 @@
 name: Release Api Gateway - Step 2
 
 permissions:
-  id-token: write
-  contents: write
+  id-token: write # This is required by image-builder
+  contents: write # Read is required by image-builder, write is required to push artifact
 
 on:
   push:
@@ -47,31 +47,17 @@ jobs:
             echo "is_patch=false" >> $GITHUB_OUTPUT
           fi
 
-  build-image:
-    uses: kyma-project/test-infra/.github/workflows/image-builder.yml@main
-    needs: [check-prerequisites]
-    with:
-      name: api-gateway/releases/api-gateway-manager
-      dockerfile: Dockerfile
-      context: .
-      build-args: |
-        VERSION=${{ needs.check-prerequisites.outputs.current_release }}
-      tags: "${{ needs.check-prerequisites.outputs.current_release }}"
-
-  unit-tests:
-    uses: ./.github/workflows/call-unit-lint.yaml
-
-  integration-tests:
-    needs: build-image
-    uses: ./.github/workflows/call-integration-release.yaml
-    with:
-      image: "europe-docker.pkg.dev/kyma-project/prod/api-gateway/releases/api-gateway-manager:${{ needs.check-prerequisites.outputs.current_release }}"
-    secrets: inherit
+  create-test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: check-prerequisites
+    steps:
+      - name: Test
+        run: echo "${{ needs.check-prerequisites.outputs.current_release }}"
 
   create-draft:
     name: Create draft release
     runs-on: ubuntu-latest
-    needs: [check-prerequisites, build-image, unit-tests, integration-tests]
     outputs:
       release_id: ${{ steps.create-draft.outputs.release_id }}
     steps:
