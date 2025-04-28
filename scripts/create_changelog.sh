@@ -6,7 +6,7 @@ set -o errexit  # exit immediately when a command fails.
 set -E          # needs to be set if we want the ERR trap
 set -o pipefail # prevents errors in a pipeline from being masked
 
-RELEASE_TAG=$1
+RELEASE_TAG="${1:-}"
 
 # Set default repository if not provided
 REPOSITORY=${REPOSITORY:-kyma-project/api-gateway}
