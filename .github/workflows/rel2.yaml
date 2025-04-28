@@ -1,8 +1,8 @@
 name: Release Api Gateway - Step 2
 
 permissions:
-  id-token: write # This is required by image-builder
-  contents: write # Read is required by image-builder, write is required to push artifact
+  id-token: write
+  contents: write
 
 on:
   push:
@@ -47,17 +47,10 @@ jobs:
             echo "is_patch=false" >> $GITHUB_OUTPUT
           fi
 
-  create-test:
-    name: Test
-    runs-on: ubuntu-latest
-    needs: check-prerequisites
-    steps:
-      - name: Test
-        run: echo "${{ needs.check-prerequisites.outputs.current_release }}"
-
   create-draft:
     name: Create draft release
     runs-on: ubuntu-latest
+    needs: [check-prerequisites]
     outputs:
       release_id: ${{ steps.create-draft.outputs.release_id }}
     steps:
