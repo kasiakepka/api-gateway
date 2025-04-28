@@ -63,7 +63,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           RELEASE=${{ needs.check-prerequisites.outputs.current_release }}
-          ./scripts/create_changelog.sh "$RELEASE"
+          ./scripts/create_changelog.sh $RELEASE
 
       - name: Create draft release
         id: create-draft
