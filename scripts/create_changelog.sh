@@ -37,6 +37,3 @@ fi
 
 # Fetch commit history between the previous and current release
 echo -e "\n**Full changelog:** https://github.com/$REPOSITORY/compare/${LATEST_TAG}...${RELEASE_TAG}" >> ${CHANGELOG_FILE}
-
-
-gh issue list --repo "github.tools.sap/kyma/security-scans-modular" --assignee "I304607" --state open | awk '{print "https://github.tools.sap/kyma/security-scans-modular/issues/" $1, $4}' | sort -t: -k 3
