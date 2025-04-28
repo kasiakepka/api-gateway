@@ -57,6 +57,7 @@ jobs:
 
   create-draft:
     name: Create draft release
+    needs: check-prerequisites
     runs-on: ubuntu-latest
     outputs:
       release_id: ${{ steps.create-draft.outputs.release_id }}
