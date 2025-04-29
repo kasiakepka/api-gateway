@@ -9,7 +9,7 @@ on:
     branches:
       - 'release-**'
     paths:
-      - 'sec-scanners-config.yml'
+      - 'sec-scanners-config.yaml'
 
 jobs:   
   check-prerequisites: 
