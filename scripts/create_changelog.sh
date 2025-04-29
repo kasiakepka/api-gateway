@@ -27,11 +27,14 @@ TAGS=$(curl -s -H "$GITHUB_AUTH_HEADER" "$GITHUB_URL/releases" | grep -o '"tag_n
 echo "Determine the previous release based on versioning rules"
 LATEST_TAG=""
 if [ $PATCH -ne 0 ]; then
+  echo "option 1"
   LATEST_TAG=$(echo "$TAGS" | grep -E "^${MAJOR}\.${MINOR}\." | tail -1)
 elif [ "$MINOR" -ne 0 ]; then
+  echo "option 2"
   PREV_MINOR=$(($MINOR - 1))
   LATEST_TAG=$(echo "$TAGS" | grep -E "^${MAJOR}\.${PREV_MINOR}\." | head -n 1)
 else
+  echo "option 3"
   PREV_MAJOR=$(($MAJOR - 1))
   LATEST_TAG=$(echo "$TAGS" | grep -E "^${PREV_MAJOR}\." | head -n 1)
 fi
