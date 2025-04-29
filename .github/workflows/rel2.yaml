@@ -9,7 +9,7 @@ on:
     branches:
       - 'release-**'
     paths:
-      - 'sec-scanners-config.yaml'
+      - 'sec-scanners-config.yml'
 
 jobs:   
   check-prerequisites: 
@@ -30,14 +30,12 @@ jobs:
           CURRENT=$(grep api-gateway-manager ./sec-scanners-config.yaml | cut -d ":" -f2 | xargs)
           echo "Current release: $CURRENT"
           echo "current_release=$CURRENT" >> $GITHUB_OUTPUT
-
       - name: Get latest release before releasing
         id: get-latest
         run: |
           LATEST=$(curl -s https://api.github.com/repos/kyma-project/api-gateway/releases/latest | grep '"tag_name"' | cut -d '"' -f 4)
           echo "Latest release before releasing: $LATEST"
           echo "latest_before=$LATEST" >> $GITHUB_OUTPUT
-
       - name: Determine if this is a patch release
         id: check_patch
         run: |
@@ -46,18 +44,10 @@ jobs:
           else
             echo "is_patch=false" >> $GITHUB_OUTPUT
           fi
-
-  create-test:
-    name: Test
-    runs-on: ubuntu-latest
-    needs: check-prerequisites
-    steps:
-      - name: Test
-        run: echo "${{ needs.check-prerequisites.outputs.current_release }}"
-
   create-draft:
     name: Create draft release
     runs-on: ubuntu-latest
+    needs: [check-prerequisites]
     outputs:
       release_id: ${{ steps.create-draft.outputs.release_id }}
     steps:
@@ -70,8 +60,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           RELEASE=${{ needs.check-prerequisites.outputs.current_release }}
-          ./scripts/create_changelog.sh "$RELEASE"
-
+          echo "$RELEASE"
       - name: Create draft release
         id: create-draft
         env:
@@ -79,12 +68,10 @@ jobs:
         run: |
           RELEASE_ID=$(./scripts/create_draft_release.sh ${{ needs.check-prerequisites.outputs.current_release }})
           echo "release_id=$RELEASE_ID" >> $GITHUB_OUTPUT
-
       - name: Create lightweight tag
         run: |
           git tag ${{ needs.check-prerequisites.outputs.current_release }}
           git push origin ${{ needs.check-prerequisites.outputs.current_release }}
-
   publish-release:
     name: Publish release
     needs: [create-draft]
@@ -118,7 +105,6 @@ jobs:
           payload: |
             repository: ${{ github.repository }},
             release: ${{ needs.check-prerequisites.outputs.current_release }}
-
   post-release-adjustments:
     runs-on: ubuntu-latest
     needs: publish-release
@@ -137,7 +123,6 @@ jobs:
               -H "Accept: application/vnd.github+json" \
               -H "Authorization: Bearer ${GITHUB_TOKEN}" \
               https://api.github.com/repos/kyma-project/api-gateway/releases/tags/${LATEST_BEFORE} | jq -r '.id')
-
             curl -X PATCH \
               -H "Accept: application/vnd.github+json" \
               -H "Authorization: Bearer ${GITHUB_TOKEN}" \
@@ -145,16 +130,17 @@ jobs:
               -d '{"make_latest":"true"}'
           else
             echo "No action needed: $CURRENT_RELEASE is the latest"
-          fi
-
+          fi   
+          
       - name: Update Dependabot for major/minor releases
-        if: ${{ needs.check-prerequisites.outputs.is_patch == 'false' }}
+        if: env.is_patch == 'false'
         env:
           GH_TOKEN: ${{ secrets.GOAT_BOT_REPO_ACCESS }}
-          CURRENT_RELEASE: ${{ needs.check-prerequisites.outputs.current_release }}
+          CURRENT_RELEASE: $current_release
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          
           git checkout -b dependabot-config/$CURRENT_RELEASE
           sed -i "s|release\-.*|release\-$CURRENT_RELEASE\"|g" .github/dependabot.yml
           git add .
@@ -166,4 +152,5 @@ jobs:
           git push -f -u origin dependabot-config/$CURRENT_RELEASE
           gh pr create --base main --head dependabot-config/$CURRENT_RELEASE --fill || true 
 
+          # Delete sec-scanners-config/$CURRENT_RELEASE branch from first part of the release
           gh api --method DELETE repos/${{ github.repository }}/git/refs/heads/sec-scanners-config/$CURRENT_RELEASE || echo "Failed to delete branch"
