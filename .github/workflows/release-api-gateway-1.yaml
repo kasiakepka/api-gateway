@@ -43,7 +43,9 @@ jobs:
           REL_BRANCH: ${{ env.branch_name}}
           BRANCH_EXISTS: ${{ env.branch_exists }}
         run: |
-
+          git config user.name "kasiakepka"
+          git config user.email "kasia.kepka23@gmail.com"
+          
           git fetch origin
           git checkout -f sec-scanners-config/release
 
